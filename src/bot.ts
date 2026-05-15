@@ -18,7 +18,8 @@ type BotConfig<Ctx extends Context> = {
 };
 
 type LaunchOptions = {
-  allowedUpdates: UpdateType[],
+  allowedUpdates?: UpdateType[];
+  onPollingError?: (err: Error, retryCount: number, nextDelayMs: number) => void;
 };
 
 const defaultConfig: BotConfig<Context> = {
@@ -33,6 +34,10 @@ export class Bot<Ctx extends Context = Context> extends Composer<Ctx> {
   private polling?: Polling;
 
   private pollingIsStarted = false;
+
+  public isPollingActive(): boolean {
+    return this.pollingIsStarted;
+  }
 
   private config: BotConfig<Ctx>;
 
@@ -69,7 +74,7 @@ export class Bot<Ctx extends Context = Context> extends Composer<Ctx> {
     this.polling = new Polling(this.api, options?.allowedUpdates);
 
     debug(`Starting @${this.botInfo.username}`);
-    await this.polling.loop(this.handleUpdate);
+    await this.polling.loop(this.handleUpdate, options?.onPollingError);
   };
 
   stop = () => {

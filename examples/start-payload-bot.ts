@@ -1,4 +1,4 @@
-import { Bot } from '@maxhub/max-bot-api';
+import { Bot } from '@irklva/max-bot-api';
 
 const token = process.env.BOT_TOKEN;
 if (!token) throw new Error('Token not provided');
