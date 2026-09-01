@@ -32,6 +32,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "prepare": "npm run build",
     "lint": "eslint ./src --ext ts --report-unused-disable-directives",
     "test": "vitest run",
     "test:watch": "vitest"
