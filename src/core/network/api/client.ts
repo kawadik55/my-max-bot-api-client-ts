@@ -55,7 +55,7 @@ export const createClient = (token: string, options: ClientOptions = {}) => {
       res = await fetch(url.href, init);
     } catch (err) {
       // Сетевая ошибка (ECONNRESET, ETIMEDOUT и т.п.)
-      throw new Error(`Network error: ${err.message}`);
+      throw new Error(`Network error: ${err instanceof Error ? err.message : String(err)}`);
     }
 
     if (res.status === 401) {
