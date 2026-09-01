@@ -74,7 +74,7 @@ export const createClient = (token: string, options: ClientOptions = {}) => {
     try {
       data = JSON.parse(text);
     } catch {
-      throw new Error(`MAX API вернул не JSON (статус ${res.status}): ${text.slice(0, 200)}`);
+      throw new Error(`MAX API вернул не JSON (503): ${text.slice(0, 200)}`);
     }
 
     return {
