@@ -50,13 +50,7 @@ export const createClient = (token: string, options: ClientOptions = {}) => {
     const init: RequestInit = { ...getResponseInit(callOptions?.body), method: httpMethod };
     init.headers = { ...init.headers, Authorization: token };
 
-    let res;
-    try {
-      res = await fetch(url.href, init);
-    } catch (err) {
-      // Сетевая ошибка (ECONNRESET, ETIMEDOUT и т.п.)
-      throw new Error(`Network error: ${err instanceof Error ? err.message : String(err)}`);
-    }
+    const res = await fetch(url.href, init);
 
     if (res.status === 401) {
       return {
@@ -73,9 +67,11 @@ export const createClient = (token: string, options: ClientOptions = {}) => {
     let data;
     try {
       data = JSON.parse(text);
-    } catch {
-      throw new Error(`MAX API вернул не JSON (503): ${text.slice(0, 200)}`);
-    }
+    } catch (parseError) {
+		  const error = new Error(`MAX API вернул не JSON: ${text.slice(0, 200)}`);
+		  error.code = res.status || 'MAX_API_PARSE_ERROR';
+		  throw error;
+		}
 
     return {
       status: res.status,
