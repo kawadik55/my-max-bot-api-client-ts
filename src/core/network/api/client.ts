@@ -50,7 +50,13 @@ export const createClient = (token: string, options: ClientOptions = {}) => {
     const init: RequestInit = { ...getResponseInit(callOptions?.body), method: httpMethod };
     init.headers = { ...init.headers, Authorization: token };
 
-    const res = await fetch(url.href, init);
+    let res;
+    try {
+      res = await fetch(url.href, init);
+    } catch (err) {
+      // Сетевая ошибка (ECONNRESET, ETIMEDOUT и т.п.)
+      throw new Error(`Network error: ${err.message}`);
+    }
 
     if (res.status === 401) {
       return {
@@ -62,9 +68,18 @@ export const createClient = (token: string, options: ClientOptions = {}) => {
       };
     }
 
+    // Для всех статусов, включая 200, проверяем, что ответ — JSON
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new Error(`MAX API вернул не JSON (статус ${res.status}): ${text.slice(0, 200)}`);
+    }
+
     return {
       status: res.status,
-      data: await res.json(),
+      data
     };
   };
 
