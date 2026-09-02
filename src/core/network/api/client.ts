@@ -72,7 +72,6 @@ export const createClient = (token: string, options: ClientOptions = {}) => {
 		  (error as any).status = res.status || 'MAX_API_PARSE_ERROR';
 		  (error as any).name = 'FetchError';
 		  throw error;
-      };
 	}
 
     return {
