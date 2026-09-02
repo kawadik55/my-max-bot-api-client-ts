@@ -68,15 +68,10 @@ export const createClient = (token: string, options: ClientOptions = {}) => {
     try {
       data = JSON.parse(text);
     } catch (parseError) {
-		  //const error = new Error(`MAX API вернул не JSON: ${text.slice(0, 200)}`);
-		  //(error as any).code = res.status || 'MAX_API_PARSE_ERROR';
-		  //throw error;
-		return {
-        status: res.status || 502,
-        data: {
-          code: res.status || 502,
-          message: `MAX API вернул не JSON: ${text.slice(0, 200)}`
-        }
+		  const error = new Error(`MAX API вернул не JSON: ${text.slice(0, 200)}`);
+		  (error as any).status = res.status || 'MAX_API_PARSE_ERROR';
+		  (error as any).name = 'FetchError';
+		  throw error;
       };
 	}
 
