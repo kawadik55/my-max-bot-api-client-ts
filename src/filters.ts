@@ -5,6 +5,7 @@ import type {
 export const createdMessageBodyHas = <Keys extends Array<keyof MessageBody>>(...keys: Keys) => {
   return (update: Update): update is MessageCreatedUpdate => {
     if (update.update_type !== 'message_created') return false;
+    if (!update.message || update.message.body === null || update.message.body === undefined) return false;
     for (const key of keys) {
       if (!(key in update.message.body)) return false;
       if (update.message.body[key] === undefined) return false;
