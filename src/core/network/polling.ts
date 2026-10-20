@@ -7,6 +7,8 @@ const debug = createDebug('one-me:polling');
 
 const RETRY_DELAYS = [1_000, 2_000, 4_000, 8_000, 10_000];
 
+let updatesNotFoundCount = 0;
+
 export function isRetryableError(err: unknown): err is Error {
   if (!(err instanceof Error)) return false;
   if (err.name === 'AbortError') return false;
@@ -15,6 +17,16 @@ export function isRetryableError(err: unknown): err is Error {
   if (err instanceof TypeError && err.message === 'fetch failed') return true; // нативный fetch, сбой соединения
   if (err instanceof MaxError && err.status === 429) return true;
   if (err instanceof MaxError && err.status >= 500) return true;
+  if (err.message && err.message.includes('Path /updates is not recognized'))
+  {	  
+	  updatesNotFoundCount++;
+    if (updatesNotFoundCount >= 100) 
+	  {
+		  updatesNotFoundCount = 0;
+		  return false;  // после 100 попыток — не ретраим
+    }
+	  return true;
+  }
   return false;
 }
 
